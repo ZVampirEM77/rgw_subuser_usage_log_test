@@ -1,5 +1,3 @@
-# rgw_subuser_usage_log_test
-
 一、操作步骤
 1、下载源码并进行编译
 $ git clone https://github.com/ZVampirEM77/ceph.git
@@ -64,4 +62,3 @@ $ python S3SubuserCLIApiAutoTest.py --ceph-path=$CEPH_PATH/src --opt-type=start 
 
 ***这里需要着重指出的是，当前四个自动化测试脚本对于start_time和end_time两个参数的测试，均需要手动去对这两个参数进行指定，具体为在
 class Tester中的  m_start_time_stamp和m_end_time_stamp两个变量，测试时需要 根据具体需求，手动修改。
-
