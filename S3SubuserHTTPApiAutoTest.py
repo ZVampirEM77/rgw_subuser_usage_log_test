@@ -88,8 +88,9 @@ class Tester(object):
         # record the num of passed test case
         self.m_test_passed_num = 0
 
-        self.m_start_time_stamp = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 64800))
-        self.m_end_time_stamp = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 61200))
+        self.m_start_time_stamp = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 36000))
+        self.m_end_time_stamp = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 32400))
+        self.m_end_time_stamp2 = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 43200))
 
 
     def test_preparation(self):
@@ -138,13 +139,15 @@ class Tester(object):
         user_dict = {}
         
         if len(res_content["entries"]) == expect_dict["entries_size"] and len(res_content["summary"]) == expect_dict["entries_size"]:
-            user_dict = self.parse_response_content(res_content)
-
-            for user_info in res_content["entries"]:
-                user = self.get_user_name(user_info)
-                if user_dict[user] != expect_dict[user]:
-                    result = False
-                    break
+	    if len(res_content["entries"]) != 0:
+                user_dict = self.parse_response_content(res_content)
+                for user_info in res_content["entries"]:
+                    user = self.get_user_name(user_info)
+                    if user_dict[user] != expect_dict[user]:
+                        result = False
+                        break
+	    else:
+	        result = True
         else:
             result = False
 
@@ -167,13 +170,16 @@ class Tester(object):
             user_dict = {}
         
             if len(res_content["entries"]) == expect_dict["entries_size"] and len(res_content["summary"]) == expect_dict["entries_size"]:
-                user_dict = self.parse_response_content(res_content)
+		if len(res_content["entries"]) != 0:
+                    user_dict = self.parse_response_content(res_content)
 
-                for user_info in res_content["entries"]:
-                    user = self.get_user_name(user_info)
-                    if user_dict[user] != expect_dict[user]:
-                        result = False
-                        break
+                    for user_info in res_content["entries"]:
+                        user = self.get_user_name(user_info)
+                        if user_dict[user] != expect_dict[user]:
+                            result = False
+                            break
+	        else:
+		    result = True
             else:
                 result = False
 
@@ -568,16 +574,22 @@ class Tester(object):
 
     #test "usage trim" with uid = user
     def test_usage_trim_with_uid_user(self):
-        expect_dict = {"entries_size": 3,
+        expect_dict1 = {"entries_size": 3,
                        "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
                                      "chosenone_bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
                        "zvampirem2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}},
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
                       }
-        req_url = "http://{server}/{admin}/usage?format=json&uid={uid}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem3")
-        result = self.verify_del_response_msg(req_url, expect_dict)
 
-        if result == True:
+        expect_dict2 = {"entries_size": 0}
+
+        req_url1 = "http://{server}/{admin}/usage?format=json&uid={uid}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem3")
+        result1 = self.verify_del_response_msg(req_url1, expect_dict1)
+
+	req_url2 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem3", subuser = "chosenone3")
+	result2 = self.verify_get_response_msg(req_url2, expect_dict2)
+
+        if (result1 and result2) == True:
             self.m_test_passed_num += 1
             print "test_usage_trim_with_uid_user                                 %s" % (ok_display("OK"))
         else:
@@ -603,15 +615,21 @@ class Tester(object):
 
     #test "usage trim" with start and uid, without end:
     def test_usage_time_with_start_and_uid_without_end(self):
-        expect_dict = {"entries_size": 2,
+        expect_dict1 = {"entries_size": 2,
                        "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
                                      "chosenone_bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
-        
-        req_url = "http://{server}/{admin}/usage?format=json&uid={uid}&start={start}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem2", start = self.m_start_time_stamp)
-        result = self.verify_del_response_msg(req_url, expect_dict)
 
-        if result == True:
+        expect_dict2 = {"entries_size": 1,
+			"zvampirem2:chosenone2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}}}
+
+        
+        req_url1 = "http://{server}/{admin}/usage?format=json&uid={uid}&start={start}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem2", start = self.m_start_time_stamp)
+        result1 = self.verify_del_response_msg(req_url1, expect_dict1)
+	req_url2 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem2", subuser = "chosenone2")
+	result2 = self.verify_get_response_msg(req_url2, expect_dict2)
+
+        if (result1 and result2) == True:
             self.m_test_passed_num += 1
             print "test_usage_time_with_start_and_uid_without_end                %s" % (ok_display("OK"))
         else:
@@ -619,16 +637,23 @@ class Tester(object):
 
     #test "usage trim" with end and uid, without start
     def test_usage_trim_with_end_and_uid_without_start(self):
-        expect_dict = {"entries_size": 2,
+        expect_dict1 = {"entries_size": 2,
                        "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
                                      "chosenone_bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}
                 }
 
-        req_url = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}&end={end}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem", subuser = "chosenone", end = self.m_end_time_stamp)
-        result = self.verify_del_response_msg(req_url, expect_dict)
+        expect_dict2 = {"entries_size": 1,
+	                "zvampirem:chosenone": {"chosenone_bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}}}
 
-        if result == True:
+
+        req_url1 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}&end={end}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem", subuser = "chosenone", end = self.m_end_time_stamp)
+        result1 = self.verify_del_response_msg(req_url1, expect_dict1)
+
+        req_url2 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem", subuser = "chosenone")
+        result2 = self.verify_get_response_msg(req_url2, expect_dict2)
+
+        if (result1 and result2) == True:
             self.m_test_passed_num += 1
             print "test_usage_trim_with_end_and_uid_without_start                %s" % (ok_display("OK"))
         else:
@@ -636,21 +661,111 @@ class Tester(object):
 
     #test "usage trim" with start, end and uid
     def test_usage_trim_with_start_end_and_uid(self):
-        expect_dict = {"entries_size": 2,
+        expect_dict1 = {"entries_size": 2,
                        "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
                                      "chosenone_bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
                 }
 
-        req_url = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}&start={start}&end={end}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem", subuser = "chosenone", start = self.m_start_time_stamp, end = self.m_end_time_stamp)
-        result = self.verify_del_response_msg(req_url, expect_dict)
+        expect_dict2 = {"entries_size": 1,
+			"zvampirem:chosenone": {"chosenone_bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}}}
 
-        if result == True:
+        req_url1 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}&start={start}&end={end}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem", subuser = "chosenone", start = self.m_start_time_stamp, end = self.m_end_time_stamp)
+        result1 = self.verify_del_response_msg(req_url1, expect_dict1)
+
+	req_url2 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem", subuser = "chosenone")
+	result2 = self.verify_get_response_msg(req_url2, expect_dict2)
+
+        if (result1 and result2) == True:
             self.m_test_passed_num += 1
             print "test_usage_trim_with_start_end_and_uid                        %s" % (ok_display("OK"))
         else:
             print "test_usage_trim_with_start_end_and_uid                        %s" % (fail_display("FAIL"))
         
+
+    # test "usage trim" with all-subuser and start time without end time
+    def test_usage_trim_with_all_subuser_and_start_without_end(self):
+	expect_dict1 = {"entries_size": 2,
+                       "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
+                                     "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
+                       "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
+                }
+        
+	expect_dict2 = {"entries_size": 0}
+	expect_dict3 = {"entries_size": 0}
+	expect_dict4 = {"entries_size": 1,
+			"time_test:time_test_sub": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
+
+	req_url1 = "http://{server}/{admin}/usage?format=json&start={start}&all-subuser=true&remove-all=true".format(server = ceph_cluster_server, admin = ceph_cluster_admin, start = self.m_start_time_stamp)
+	result1 = self.verify_del_response_msg(req_url1, expect_dict1)
+        req_url2 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem", subuser = "chosenone")
+        req_url3 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem2", subuser = "chosenone2")
+        req_url4 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "time_test", subuser = "time_test_sub")
+        result2 = self.verify_get_response_msg(req_url2, expect_dict2)
+        result3 = self.verify_get_response_msg(req_url3, expect_dict3)
+	result4 = self.verify_get_response_msg(req_url4, expect_dict4)
+
+        if (result1 and result2 and result3 and result4) == True:
+            self.m_test_passed_num += 1
+            print "test_usage_trim_with_all_subuser_and_start_without_end        %s" % (ok_display("OK"))
+        else:
+            print "test_usage_trim_with_all_subuser_and_start_without_end        %s" % (fail_display("FAIL"))
+
+    # test "usage trim" with all subuser and end time without start time
+    def test_usage_trim_with_all_subuser_and_end_without_start(self):
+        expect_dict1 = {"entries_size": 2,
+                       "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
+                                     "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
+                       "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
+                }
+        
+	expect_dict2 = {"entries_size": 0}
+	expect_dict3 = {"entries_size": 0}
+	expect_dict4 = {"entries_size": 1,
+			"time_test:time_test_sub": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
+
+	req_url1 = "http://{server}/{admin}/usage?format=json&end={end}&all-subuser=true&remove-all=true".format(server = ceph_cluster_server, admin = ceph_cluster_admin, end = self.m_end_time_stamp2)
+	result1 = self.verify_del_response_msg(req_url1, expect_dict1)
+        req_url2 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem", subuser = "chosenone")
+        req_url3 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem2", subuser = "chosenone2")
+        req_url4 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "time_test", subuser = "time_test_sub")
+        result2 = self.verify_get_response_msg(req_url2, expect_dict2)
+        result3 = self.verify_get_response_msg(req_url3, expect_dict3)
+	result4 = self.verify_get_response_msg(req_url4, expect_dict4)
+
+        if (result1 and result2 and result3 and result4) == True:
+            self.m_test_passed_num += 1
+            print "test_usage_trim_with_all_subuser_and_end_without_start        %s" % (ok_display("OK"))
+        else:
+            print "test_usage_trim_with_all_subuser_and_end_without_start        %s" % (fail_display("FAIL"))
+
+    # test "usage trim" with all subuser without start time and end time
+    def test_usage_trim_with_all_subuser_without_start_and_end(self):
+        expect_dict1 = {"entries_size": 2,
+		       "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
+                                     "chosenone_bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
+                       "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
+                }
+        
+	expect_dict2 = {"entries_size": 0}
+	expect_dict3 = {"entries_size": 0}
+	expect_dict4 = {"entries_size": 0}
+
+	req_url1 = "http://{server}/{admin}/usage?format=json&all-subuser=true&remove-all=true".format(server = ceph_cluster_server, admin = ceph_cluster_admin)
+	result1 = self.verify_del_response_msg(req_url1, expect_dict1)
+        req_url2 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem", subuser = "chosenone")
+        req_url3 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "zvampirem2", subuser = "chosenone2")
+        req_url4 = "http://{server}/{admin}/usage?format=json&uid={uid}&subuser={subuser}".format(server = ceph_cluster_server, admin = ceph_cluster_admin, uid = "time_test", subuser = "time_test_sub")
+        result2 = self.verify_get_response_msg(req_url2, expect_dict2)
+        result3 = self.verify_get_response_msg(req_url3, expect_dict3)
+	result4 = self.verify_get_response_msg(req_url4, expect_dict4)
+
+        if (result1 and result2 and result3 and result4) == True:
+            self.m_test_passed_num += 1
+            print "test_usage_trim_with_all_subuser_without_start_and_end        %s" % (ok_display("OK"))
+        else:
+            print "test_usage_trim_with_all_subuser_without_start_and_end        %s" % (fail_display("FAIL"))
+
 
 
     #test "usage trim" with start and remove-all = True, without end
@@ -716,6 +831,9 @@ class Tester(object):
         self.test_usage_time_with_start_and_uid_without_end()
         self.test_usage_trim_with_end_and_uid_without_start()
         self.test_usage_trim_with_start_end_and_uid()
+	self.test_usage_trim_with_all_subuser_without_start_and_end()
+#	self.test_usage_trim_with_all_subuser_and_start_without_end()
+#	self.test_usage_trim_with_all_subuser_and_end_without_start()
 ##        self.test_usage_trim_with_start_and_remove_all_without_end()
 #        self.test_usage_trim_with_end_and_remove_all_without_start()
 #        self.test_usage_trim_with_start_and_end_and_remove_all()
@@ -744,7 +862,7 @@ class Tester(object):
         and self.clean_env("zvampirem3") \
         and self.clean_env("zvampirem3:chosenone3"):
             print "Test End!"
-            print "Total test case: 31, OK: %d, FAIL: %d" % (self.m_test_passed_num, 31 - self.m_test_passed_num)
+            print "Total test case: 32, OK: %d, FAIL: %d" % (self.m_test_passed_num, 32 - self.m_test_passed_num)
 
 
 if __name__ == '__main__':

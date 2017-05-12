@@ -17,6 +17,8 @@ import time
 import argparse
 import subprocess
 
+CEPH_VERSION = "M"
+
 def exec_command(command):
     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     p.communicate()
@@ -62,38 +64,43 @@ class Tester(object):
 	self.m_s3_instance = S3()
 	self.m_test_passed_num = 0
 	self.m_ceph_manager = ceph_manager
-	self.m_start_time_stamp = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 64800))
-	self.m_end_time_stamp = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 61200))
+	self.m_start_time_stamp = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 32400))
+	self.m_end_time_stamp = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 28800))
+	self.m_end_time_stamp2 = time.strftime('%Y-%m-%d %H:00:00', time.localtime(time.time() - 43200))
 
     def Run(self):
 	self.test_usage_show_without_any_param()
-	self.test_usage_show_with_uid_user_for_user_operating()
-	self.test_usage_show_with_uid_subuser_for_user_operating()
-	self.test_usage_show_with_uid_user_for_subuser_operating()
-	self.test_usage_show_with_uid_subuser_for_subuser_operating()
-	self.test_usage_show_with_uid_user_without_categories()
-	self.test_usage_show_with_uid_subuser_without_categories()
-	self.test_usage_show_with_categories_without_uid()
-	self.test_usage_show_with_uid_and_categories()
-	self.test_usage_show_with_uid_subuser_and_categories()
-	self.test_usage_show_with_start_time_without_end_time_uid_categories()
-	self.test_usage_show_with_start_time_and_uid_without_end_time_categories()
-	self.test_usage_show_with_start_time_and_categories_without_end_time_uid()
-	self.test_usage_show_with_start_time_uid_categories_without_end_time()
-	self.test_usage_show_with_end_time_without_start_time_uid_and_categories()
-	self.test_usage_show_with_end_time_and_uid_without_start_time_categories()
-	self.test_usage_show_with_end_time_and_categories_without_start_time_uid()
-	self.test_usage_show_with_end_time_uid_and_categories_without_start_time()
-	self.test_usage_show_with_start_time_and_end_time_without_uid_categories()
-	self.test_usage_show_with_start_time_end_time_and_uid_without_categories()
-	self.test_usage_show_with_start_time_end_time_uid_and_categories()
-	self.test_usage_show_with_show_entries_false()
-	self.test_usage_show_with_show_summary_false()
-	self.test_usage_trim_with_uid_user()
-	self.test_usage_trim_with_uid_subuser()
-	self.test_usage_trim_with_start_time_and_uid_without_end_time()
-	self.test_usage_trim_with_end_time_and_uid_without_start_time()
-	self.test_usage_trim_with_start_time_end_time_and_uid()
+        self.test_usage_show_with_uid_user_for_user_operating()
+        self.test_usage_show_with_uid_subuser_for_user_operating()
+      	self.test_usage_show_with_uid_user_for_subuser_operating()
+      	self.test_usage_show_with_uid_subuser_for_subuser_operating()
+      	self.test_usage_show_with_uid_user_without_categories()
+      	self.test_usage_show_with_uid_subuser_without_categories()
+      	self.test_usage_show_with_categories_without_uid()
+      	self.test_usage_show_with_uid_and_categories()
+      	self.test_usage_show_with_uid_subuser_and_categories()
+      	self.test_usage_show_with_start_time_without_end_time_uid_categories()
+      	self.test_usage_show_with_start_time_and_uid_without_end_time_categories()
+      	self.test_usage_show_with_start_time_and_categories_without_end_time_uid()
+      	self.test_usage_show_with_start_time_uid_categories_without_end_time()
+      	self.test_usage_show_with_end_time_without_start_time_uid_and_categories()
+      	self.test_usage_show_with_end_time_and_uid_without_start_time_categories()
+      	self.test_usage_show_with_end_time_and_categories_without_start_time_uid()
+      	self.test_usage_show_with_end_time_uid_and_categories_without_start_time()
+      	self.test_usage_show_with_start_time_and_end_time_without_uid_categories()
+      	self.test_usage_show_with_start_time_end_time_and_uid_without_categories()
+      	self.test_usage_show_with_start_time_end_time_uid_and_categories()
+      	self.test_usage_show_with_show_entries_false()
+      	self.test_usage_show_with_show_summary_false()
+      	self.test_usage_trim_with_uid_user()
+      	self.test_usage_trim_with_uid_subuser()
+      	self.test_usage_trim_with_start_time_and_uid_without_end_time()
+      	self.test_usage_trim_with_end_time_and_uid_without_start_time()
+      	self.test_usage_trim_with_start_time_end_time_and_uid()
+	self.test_usage_trim_with_all_subuser_and_start_time_without_end_time()
+	self.test_usage_trim_with_all_subuser_and_end_time_without_start_time()
+	self.test_usage_trim_with_all_subuser_and_start_time_and_end_time()
+#	self.test_usage_trim_with_all_subuser_without_start_time_and_end_time()
 #	self.test_usage_trim_with_start_time_and_remove_all_without_end_time()
 #	self.test_usage_trim_with_end_time_and_remove_all_without_start_time()
 #	self.test_usage_trim_with_start_time_and_end_time_and_remove_all()
@@ -148,11 +155,14 @@ class Tester(object):
 	user_dict = {}
 
 	if len(data["entries"]) == expect_dict["entries_size"] and len(data["summary"]) == expect_dict["entries_size"]:
-	    user_dict = self.parse_response_content(data)
-	    for user_info in data["entries"]:
-                user = self.get_user_name(user_info)  
-	        if user_dict[user] != expect_dict[user]:
-		    result = False
+	    if len(data["entries"]) != 0:
+	        user_dict = self.parse_response_content(data)
+	        for user_info in data["entries"]:
+                    user = self.get_user_name(user_info)  
+	            if user_dict[user] != expect_dict[user]:
+		        result = False
+	    else:
+		result = True
         else:
 	    result = False
 	
@@ -161,22 +171,29 @@ class Tester(object):
     #verify the response msg is same with expect result
     def verify_trim_response_msg(self, req_command, expect_dict):
 	exec_command(req_command)	
-        usage_log = exec_command_with_return("./radosgw-admin usage show")	
+	if CEPH_VERSION == "J":
+            usage_log = exec_command_with_return("./radosgw-admin usage show")	
+	else:
+	    usage_log = exec_command_with_return("./bin/radosgw-admin usage show")	
+
 	data = json.load(usage_log)	
 #        print data
         result = True
         user_dict = {}
 
 	if len(data["entries"]) == expect_dict["entries_size"] and len(data["summary"]) == expect_dict["entries_size"]:
-	    user_dict = self.parse_response_content(data)
+	    if len(data["entries"]) != 0:
+	        user_dict = self.parse_response_content(data)
 
-	    for user_info in data["entries"]:
-                user = self.get_user_name(user_info)
-	        if user_dict[user] != expect_dict[user]:
-		    result = False
+	        for user_info in data["entries"]:
+                    user = self.get_user_name(user_info)
+	            if user_dict[user] != expect_dict[user]:
+		        result = False
+	    else:
+		result = True
         else:
-	    result = False
-	
+	    result = False	
+
 	return result
 
 
@@ -190,8 +207,11 @@ class Tester(object):
 		       "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
 
 		      }
+	if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg("./radosgw-admin usage show", expect_dict)
+	else:
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show", expect_dict)
 
-	result = self.verify_show_response_msg("./radosgw-admin usage show", expect_dict)
 	
 	if result == True:	
 	    self.m_test_passed_num += 1
@@ -205,7 +225,10 @@ class Tester(object):
 	expect_dict = {"entries_size": 1,
                        "zvampirem3": {"": {"categories": {"list_buckets": {"ops": 6, "successful_ops": 6}}}}}
 
-        result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem3", expect_dict)
+	if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem3", expect_dict)
+	else:
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show --uid=zvampirem3", expect_dict)
 
         if result == True:
             self.m_test_passed_num += 1
@@ -216,17 +239,19 @@ class Tester(object):
 
     #To test "usage show" with uid = subuser for user operating
     def test_usage_show_with_uid_subuser_for_user_operating(self):
-	expect_dict = {"entries_size": 0, "summary_size": 0}
+	expect_dict = {"entries_size": 0}
         
-	usage_log = exec_command_with_return("./radosgw-admin usage show --uid=zvampirem3 --subuser=chosenone3")	
-	data = json.load(usage_log)
-	
-        result = True
-	if len(data["entries"]) == expect_dict["entries_size"] and len(data["summary"]) == expect_dict["summary_size"]:
-	    if data["entries"] != [] or data["summary"] != []:
-	        result = False
+	if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem3 --subuser=chosenone3", expect_dict)
 	else:
-	    result = False
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show --uid=zvampirem3 --subuser=chosenone3", expect_dict)
+	
+#        result = True
+#	if len(data["entries"]) == expect_dict["entries_size"] and len(data["summary"]) == expect_dict["summary_size"]:
+#	    if data["entries"] != [] or data["summary"] != []:
+#	        result = False
+#	else:
+#	    result = False
 
 	if result == True:
 	    self.m_test_passed_num += 1
@@ -241,7 +266,10 @@ class Tester(object):
                        "zvampirem2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}}
                        }
 	
-	result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem2", expect_dict)
+        if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem2", expect_dict)
+	else:
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show --uid=zvampirem2", expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -255,7 +283,10 @@ class Tester(object):
         expect_dict = {"entries_size": 1,
                        "zvampirem2:chosenone2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}}}
 
-	result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2", expect_dict)
+	if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2", expect_dict)
+        else:
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2", expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -271,7 +302,10 @@ class Tester(object):
                        "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
                                      "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}}}
     
-	result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem", expect_dict)
+        if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem", expect_dict)
+	else:
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show --uid=zvampirem", expect_dict)
 	
         if result == True:
 	    self.m_test_passed_num += 1
@@ -285,7 +319,10 @@ class Tester(object):
         expect_dict = {"entries_size": 1,
                        "zvampirem:chosenone": {"chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}}}
 
-	result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem --subuser=chosenone", expect_dict)
+	if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem --subuser=chosenone", expect_dict)
+	else:
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show --uid=zvampirem --subuser=chosenone", expect_dict)
 	
         if result == True:
 	    self.m_test_passed_num += 1
@@ -303,7 +340,10 @@ class Tester(object):
                        "zvampirem3": {"": {"categories": {"list_buckets": {"ops": 6, "successful_ops": 6}}}},
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
 	
-        result = self.verify_show_response_msg("./radosgw-admin usage show --categories=list_buckets", expect_dict)
+        if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg("./radosgw-admin usage show --categories=list_buckets", expect_dict)
+	else:
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show --categories=list_buckets", expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -318,7 +358,10 @@ class Tester(object):
                        "zvampirem": {"": {"categories": {}},
                                      "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}}}}}
         
-        result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem --categories=create_bucket", expect_dict)
+        if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem --categories=create_bucket", expect_dict)
+	else:
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show --uid=zvampirem --categories=create_bucket", expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -332,7 +375,10 @@ class Tester(object):
         expect_dict = {"entries_size": 1,
                        "zvampirem:chosenone": {"chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}}}}}
 
-	result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem --subuser=chosenone --categories=create_bucket", expect_dict)
+	if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg("./radosgw-admin usage show --uid=zvampirem --subuser=chosenone --categories=create_bucket", expect_dict)
+	else:
+	    result = self.verify_show_response_msg("./bin/radosgw-admin usage show --uid=zvampirem --subuser=chosenone --categories=create_bucket", expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -349,7 +395,10 @@ class Tester(object):
                         "zvampirem2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}},
                         "zvampirem3": {"": {"categories": {"list_buckets": {"ops": 6, "successful_ops": 6}}}}}
 
-        result = self.verify_show_response_msg('./radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '"', expect_dict)
+        if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg('./radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '"', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '"', expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -363,7 +412,10 @@ class Tester(object):
         expect_dict = {"entries_size": 1,
                        "zvampirem3": {"": {"categories": {"list_buckets": {"ops": 6, "successful_ops": 6}}}}}
 
-        result = self.verify_show_response_msg('./radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '" --uid=zvampirem3', expect_dict)
+	if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg('./radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '" --uid=zvampirem3', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '" --uid=zvampirem3', expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -381,7 +433,10 @@ class Tester(object):
                        "zvampirem2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}},
                        "zvampirem3": {"": {"categories": {"list_buckets": {"ops": 6, "successful_ops": 6}}}}}
 
-        result = self.verify_show_response_msg('./radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '" --categories=list_buckets', expect_dict)
+        if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg('./radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '" --categories=list_buckets', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '" --categories=list_buckets', expect_dict)
     
         if result == True:
 	    self.m_test_passed_num += 1
@@ -394,7 +449,10 @@ class Tester(object):
 	expect_dict = {"entries_size": 1,
                        "zvampirem:chosenone": {"chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}}}}}
 
-	result = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --subuser=chosenone --start-date="' + self.m_start_time_stamp + '" --categories=create_bucket', expect_dict)
+	if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --subuser=chosenone --start-date="' + self.m_start_time_stamp + '" --categories=create_bucket', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem --subuser=chosenone --start-date="' + self.m_start_time_stamp + '" --categories=create_bucket', expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -408,7 +466,10 @@ class Tester(object):
 	expect_dict = {"entries_size": 1,
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
 
-        result = self.verify_show_response_msg('./radosgw-admin usage show --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg('./radosgw-admin usage show --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --end-date="' + self.m_end_time_stamp + '"', expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -422,7 +483,10 @@ class Tester(object):
         expect_dict = {"entries_size": 1,
                        "time_test:time_test_sub": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
 
-	result = self.verify_show_response_msg('./radosgw-admin usage show --uid=time_test --subuser=time_test_sub --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg('./radosgw-admin usage show --uid=time_test --subuser=time_test_sub --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=time_test --subuser=time_test_sub --end-date="' + self.m_end_time_stamp + '"', expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -436,8 +500,11 @@ class Tester(object):
 	expect_dict = {"entries_size": 1,
                        "time_test": {"": {"categories": {}}},
                       }
-
-        result = self.verify_show_response_msg('./radosgw-admin usage show --categories=create_bucket --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+        
+        if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg('./radosgw-admin usage show --categories=create_bucket --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --categories=create_bucket --end-date="' + self.m_end_time_stamp + '"', expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -450,8 +517,11 @@ class Tester(object):
     def test_usage_show_with_end_time_uid_and_categories_without_start_time(self):
         expect_dict = {"entries_size": 1,
                        "time_test:time_test_sub": {"": {"categories": {}}}}
-
-	result = self.verify_show_response_msg('./radosgw-admin usage show --uid=time_test --subuser=time_test_sub --categories=create_bucket --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+        
+        if CEPH_VERSION == "J":
+	    result = self.verify_show_response_msg('./radosgw-admin usage show --uid=time_test --subuser=time_test_sub --categories=create_bucket --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=time_test --subuser=time_test_sub --categories=create_bucket --end-date="' + self.m_end_time_stamp + '"', expect_dict)
 
         if result == True:
 	    self.m_test_passed_num += 1
@@ -461,12 +531,12 @@ class Tester(object):
 
     #test "usage show" with start and end, without uid and categories
     def test_usage_show_with_start_time_and_end_time_without_uid_categories(self):
-	usage_log = exec_command_with_return('./radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '"  --end-date="' + self.m_end_time_stamp + '"')	
-	data = json.load(usage_log)
-	result = True
+	expect_dict = {"entries_size": 0}
 
-        if len(data["entries"]) != 0 or len(data["summary"]) != 0:
-            result = False
+        if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg('./radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '"  --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --start-date="' + self.m_start_time_stamp + '"  --end-date="' + self.m_end_time_stamp + '"', expect_dict)
 
         if result == True:
             self.m_test_passed_num += 1
@@ -476,12 +546,12 @@ class Tester(object):
 
     #test "usage show" with start, end and uid, without categories
     def test_usage_show_with_start_time_end_time_and_uid_without_categories(self):
-	usage_log = exec_command_with_return('./radosgw-admin usage show --uid=zvampirem --start-date="' + self.m_start_time_stamp + '"  --end-date="' + self.m_end_time_stamp + '"')	
-	data = json.load(usage_log)
-	result = True
+	expect_dict = {"entries_size": 0}
 
-        if len(data["entries"]) != 0 or len(data["summary"]) != 0:
-            result = False
+        if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --start-date="' + self.m_start_time_stamp + '"  --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem --start-date="' + self.m_start_time_stamp + '"  --end-date="' + self.m_end_time_stamp + '"', expect_dict)
 
         if result == True:
             self.m_test_passed_num += 1
@@ -492,12 +562,12 @@ class Tester(object):
 
     #test "usage show" with start, end, uid and categories
     def test_usage_show_with_start_time_end_time_uid_and_categories(self):
-        usage_log = exec_command_with_return('./radosgw-admin usage show --uid=zvampirem --categories=list_buckets --start-date="' + self.m_start_time_stamp + '"  --end-date="' + self.m_end_time_stamp + '"')	
-	data = json.load(usage_log)
-	result = True
+	expect_dict = {"entries_size": 0}
 
-        if len(data["entries"]) != 0 or len(data["summary"]) != 0:
-            result = False
+        if CEPH_VERSION == "J":
+            result = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --categories=list_buckets --start-date="' + self.m_start_time_stamp + '"  --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	else:
+	    result = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem --categories=list_buckets --start-date="' + self.m_start_time_stamp + '"  --end-date="' + self.m_end_time_stamp + '"', expect_dict)
 
         if result == True:
             self.m_test_passed_num += 1
@@ -508,7 +578,10 @@ class Tester(object):
 
     #To test "usage show" with --show-log-entries = false
     def test_usage_show_with_show_entries_false(self):
-	usage_log = exec_command_with_return("./radosgw-admin usage show --show-log-entries=false")	
+	if CEPH_VERSION == "J":
+	    usage_log = exec_command_with_return("./radosgw-admin usage show --show-log-entries=false")	
+	else:
+	    usage_log = exec_command_with_return("./bin/radosgw-admin usage show --show-log-entries=false")
 	data = json.load(usage_log)	
         result = False
 
@@ -526,7 +599,10 @@ class Tester(object):
 
     #To test "usage show" with --show-log-sum = false
     def test_usage_show_with_show_summary_false(self):
-	usage_log = exec_command_with_return("./radosgw-admin usage show --show-log-sum=false")	
+	if CEPH_VERSION == "J":
+	    usage_log = exec_command_with_return("./radosgw-admin usage show --show-log-sum=false")	
+        else:
+	    usage_log = exec_command_with_return("./bin/radosgw-admin usage show --show-log-sum=false")
 	data = json.load(usage_log)	
         result = False
 
@@ -545,16 +621,23 @@ class Tester(object):
 
     #test "usage trim" with uid = user
     def test_usage_trim_with_uid_user(self):	
-        expect_dict = {"entries_size": 3,
+        expect_dict1 = {"entries_size": 3,
                        "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
                                      "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
                        "zvampirem2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}},
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
                       }
 
-        result = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem3', expect_dict)
+	expect_dict2 = {"entries_size": 0}
+        
+        if CEPH_VERSION == "J":
+            result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem3', expect_dict1)
+	    result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem3 --subuser=chosenone3', expect_dict2)
+	else:
+	    result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --uid=zvampirem3', expect_dict1) 
+	    result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem3 --subuser=chosenone3', expect_dict2)
 
-        if result == True:
+        if (result1 and result2) == True:
 	    self.m_test_passed_num += 1
 	    print "test_usage_trim_with_uid_user                                       %s" % (ok_display("OK"))
 	else:
@@ -569,7 +652,10 @@ class Tester(object):
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
                       }
 
-	result = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem --subuser=chosenoneex', expect_dict)
+        if CEPH_VERSION == "J":
+	    result = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem --subuser=chosenoneex', expect_dict)
+        else:
+	    result = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --uid=zvampirem --subuser=chosenoneex', expect_dict)
 
 
         if result == True:
@@ -581,14 +667,22 @@ class Tester(object):
 
     #test "usage trim" with start and uid, without end:
     def test_usage_trim_with_start_time_and_uid_without_end_time(self):
-        expect_dict = {"entries_size": 2,
+        expect_dict1 = {"entries_size": 2,
                        "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
                                      "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
 
-        result = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem2 --start-date="' + self.m_start_time_stamp + '"', expect_dict)
+	expect_dict2 = {"entries_size": 1,
+			"zvampirem2:chosenone2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}}}
+        
+        if CEPH_VERSION == "J":
+            result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem2 --start-date="' + self.m_start_time_stamp + '"', expect_dict1)
+	    result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict2)
+	else:
+            result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --uid=zvampirem2 --start-date="' + self.m_start_time_stamp + '"', expect_dict1)
+            result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict2)
 
-        if result == True:
+        if (result1 and result2) == True:
 	    self.m_test_passed_num += 1
 	    print "test_usage_trim_with_start_time_and_uid_without_end_time            %s" % (ok_display("OK"))
 	else:
@@ -597,15 +691,23 @@ class Tester(object):
 	
     #test "usage trim" with end and uid, without start
     def test_usage_trim_with_end_time_and_uid_without_start_time(self):
-        expect_dict = {"entries_size": 2,
+        expect_dict1 = {"entries_size": 2,
                        "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
                                      "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
                 }
+        
+	expect_dict2 = {"entries_size": 1,
+			"zvampirem:chosenone": {"chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}}}
 
-	result = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem --subuser=chosenone --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+        if CEPH_VERSION == "J":
+	    result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem --subuser=chosenone --end-date="' + self.m_end_time_stamp + '"', expect_dict1)
+            result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	else:
+	    result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --uid=zvampirem --subuser=chosenone --end-date="' + self.m_end_time_stamp + '"', expect_dict1)
+	    result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
 
-        if result == True:
+        if (result1 and result2) == True:
 	    self.m_test_passed_num += 1
 	    print "test_usage_trim_with_end_time_and_uid_without_start_time            %s" % (ok_display("OK"))
 	else:
@@ -615,39 +717,172 @@ class Tester(object):
 
     #test "usage trim" with start, end and uid
     def test_usage_trim_with_start_time_end_time_and_uid(self):
-        expect_dict = {"entries_size": 2,
+        expect_dict1 = {"entries_size": 2,
                        "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
                                      "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
                 }
 
-	result = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem --subuser=chosenone --start-date="' + self.m_start_time_stamp + ' --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	expect_dict2 = {"entries_size": 1,
+			"zvampirem:chosenone": {"chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}}}
 
+        if CEPH_VERSION == "J":
+	    result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem --subuser=chosenone --start-date="' + self.m_start_time_stamp + ' --end-date="' + self.m_end_time_stamp + '"', expect_dict1)
+            result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	else:
+	    result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --uid=zvampirem --subuser=chosenone --start-date="' + self.m_start_time_stamp + ' --end-date="' + self.m_end_time_stamp + '"', expect_dict1)
+	    result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
 
-        if result == True:
+        if (result1 and result2) == True:
 	    self.m_test_passed_num += 1
 	    print "test_usage_trim_with_start_time_end_time_and_uid                    %s" % (ok_display("OK"))
 	else:
 	    print "test_usage_trim_with_start_time_end_time_and_uid                    %s" % (fail_display("FAIL"))
 
+    # test "usage trim" with all-subuser, without start time and end time
+    def test_usage_trim_with_all_subuser_without_start_time_and_end_time(self):
+        expect_dict1 = {"entries_size": 2,
+                       "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
+                                     "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
+                       "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
+                }
+        
+	expect_dict2 = {"entries_size": 0}
+	expect_dict3 = {"entries_size": 0}
+	expect_dict4 = {"entries_size": 0}
+
+        if CEPH_VERSION == "J":
+	    result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --all-subuser --yes-i-really-mean-it', expect_dict1)
+            result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	    result3 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict3)
+	    result4 = self.verify_show_response_msg('./radosgw-admin usage show --uid=time_test --subuser=time_test_sub', expect_dict4)
+	else:
+	    result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --all-subuser --yes-i-really-mean-it', expect_dict1)
+            result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	    result3 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict3)
+            result4 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=time_test --subuser=time_test_sub', expect_dict4)
+
+        if (result1 and result2 and result3 and result4) == True:
+	    self.m_test_passed_num += 1
+	    print "test_usage_trim_with_all_subuser_without_start_time_and_end_time    %s" % (ok_display("OK"))
+	else:
+	    print "test_usage_trim_with_all_subuser_without_start_time_and_end_time    %s" % (fail_display("FAIL"))
+
+    # test "usage trim" with all-subuser and start time without end time
+    def test_usage_trim_with_all_subuser_and_start_time_without_end_time(self):
+	expect_dict1 = {"entries_size": 2,
+                       "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
+                                     "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
+                       "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
+                }
+        
+	expect_dict2 = {"entries_size": 0}
+	expect_dict3 = {"entries_size": 0}
+	expect_dict4 = {"entries_size": 1,
+			"time_test:time_test_sub": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
+
+        if CEPH_VERSION == "J":
+	    result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --start-date="' + self.m_start_time_stamp + '" --all-subuser --yes-i-really-mean-it', expect_dict1)
+            result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	    result3 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict3)
+	    result4 = self.verify_show_response_msg('./radosgw-admin usage show --uid=time_test --subuser=time_test_sub', expect_dict4)
+	else:
+	    result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --start-date="' + self.m_start_time_stamp + '" --all-subuser --yes-i-really-mean-it', expect_dict1)
+            result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	    result3 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict3)
+            result4 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=time_test --subuser=time_test_sub', expect_dict4)
+
+        if (result1 and result2 and result3 and result4) == True:
+	    self.m_test_passed_num += 1
+	    print "test_usage_trim_with_all_subuser_and_start_time_without_end_time    %s" % (ok_display("OK"))
+	else:
+	    print "test_usage_trim_with_all_subuser_and_start_time_without_end_time    %s" % (fail_display("FAIL"))
+
+    # test "usage trim" with all-subuser and end time without start time
+    def test_usage_trim_with_all_subuser_and_end_time_without_start_time(self):
+	expect_dict1 = {"entries_size": 2,
+                       "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
+                                     "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
+                       "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
+                }
+        
+	expect_dict2 = {"entries_size": 0}
+	expect_dict3 = {"entries_size": 0}
+	expect_dict4 = {"entries_size": 1,
+			"time_test:time_test_sub": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
+
+        if CEPH_VERSION == "J":
+	    result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --all-subuser --yes-i-really-mean-it --end-date="' + self.m_end_time_stamp2 + '"', expect_dict1)
+            result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	    result3 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict3)
+	    result4 = self.verify_show_response_msg('./radosgw-admin usage show --uid=time_test --subuser=time_test_sub', expect_dict4)
+	else:
+	    result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --all-subuser --yes-i-really-mean-it --end-date="' + self.m_end_time_stamp2 + '"', expect_dict1)
+            result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	    result3 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict3)
+            result4 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=time_test --subuser=time_test_sub', expect_dict4)
+
+        if (result1 and result2 and result3 and result4) == True:
+	    self.m_test_passed_num += 1
+	    print "test_usage_trim_with_all_subuser_and_end_time_without_start_time    %s" % (ok_display("OK"))
+	else:
+	    print "test_usage_trim_with_all_subuser_and_end_time_without_start_time    %s" % (fail_display("FAIL"))
+
+    # test "usage trim" with all-subuser and start time and end time
+    def test_usage_trim_with_all_subuser_and_start_time_and_end_time(self):
+	expect_dict1 = {"entries_size": 2,
+                       "zvampirem": {"": {"categories": {"list_buckets": {"ops": 5, "successful_ops": 5}}},
+                                     "chosenone-bucket": {"categories": {"create_bucket": {"ops": 1, "successful_ops": 1}, "delete_bucket": {"ops": 1, "successful_ops": 1}}}},
+                       "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
+                }
+        
+	expect_dict2 = {"entries_size": 0}
+	expect_dict3 = {"entries_size": 0}
+	expect_dict4 = {"entries_size": 1,
+			"time_test:time_test_sub": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}}}
+
+        if CEPH_VERSION == "J":
+	    result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --all-subuser --yes-i-really-mean-it --start-date="' + self.m_start_time_stamp + '" --end-date="' + self.m_end_time_stamp + '"', expect_dict1)
+            result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	    result3 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict3)
+	    result4 = self.verify_show_response_msg('./radosgw-admin usage show --uid=time_test --subuser=time_test_sub', expect_dict4)
+	else:
+	    result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --all-subuser --yes-i-really-mean-it --start-date="' + self.m_start_time_stamp + '" --end-date="' + self.m_end_time_stamp + '"', expect_dict1)
+            result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem --subuser=chosenone', expect_dict2)
+	    result3 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict3)
+            result4 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=time_test --subuser=time_test_sub', expect_dict4)
+
+        if (result1 and result2 and result3 and result4) == True:
+	    self.m_test_passed_num += 1
+	    print "test_usage_trim_with_all_subuser_and_start_time_and_end_time        %s" % (ok_display("OK"))
+	else:
+	    print "test_usage_trim_with_all_subuser_and_start_time_and_end_time        %s" % (fail_display("FAIL"))
+
 
     #test "usage trim" with start and remove-all = True, without end
     def test_usage_trim_with_start_time_and_remove_all_without_end_time(self):
-        expect_dict = {"entries_size": 1,
+        expect_dict1 = {"entries_size": 1,
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
                        }
 
 #	result = self.verify_trim_response_msg('./radosgw-admin usage trim --uid=zvampirem:chosenone --start-date="' + self.m_start_time_stamp + ' --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+	expect_dict2 = {"entries_size": 1,
+			"zvampirem2:chosenone2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}}}
 
-        result = self.verify_trim_response_msg('./radosgw-admin usage trim --yes-i-really-mean-it --start-date="' + self.m_start_time_stamp + '"', expect_dict)
+        if CEPH_VERSION == "J":
+            result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --yes-i-really-mean-it --start-date="' + self.m_start_time_stamp + '"', expect_dict1)
+	    result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict2)
+        else:
+	    result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --yes-i-really-mean-it --start-date="' + self.m_start_time_stamp + '"', expect_dict1)
+	    result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict2)
  
-        if result == True:
+        if (result1 and result2) == True:
 	    self.m_test_passed_num += 1
 	    print "test_usage_trim_with_start_time_and_remove_all_without_end_time     %s" % (ok_display("OK"))
 	else:
 	    print "test_usage_trim_with_start_time_and_remove_all_without_end_time     %s" % (fail_display("FAIL"))
 
- 
+     
     #test "usage trim" with end and remove-all = True, without start
     def test_usage_trim_with_end_time_and_remove_all_without_start_time(self):
         self.m_test_passed_num += 1
@@ -657,13 +892,21 @@ class Tester(object):
 
     #test "usage trim" with start and end and remove-all = True
     def test_usage_trim_with_start_time_and_end_time_and_remove_all(self):
-	expect_dict = {"entries_size": 1,
+	expect_dict1 = {"entries_size": 1,
                        "time_test": {"": {"categories": {"list_buckets": {"ops": 4, "successful_ops": 4}}}},
                        }
 
-        result = self.verify_trim_response_msg('./radosgw-admin usage trim --yes-i-really-mean-it --start-date="' + self.m_start_time_stamp + ' --end-date="' + self.m_end_time_stamp + '"', expect_dict)
+        expect_dict2 = {"entries_size": 1,
+			"zvampirem2:chosenone2": {"": {"categories": {"list_buckets": {"ops": 7, "successful_ops": 7}}}}}
+        
+	if CEPH_VERSION == "J":
+            result1 = self.verify_trim_response_msg('./radosgw-admin usage trim --yes-i-really-mean-it --start-date="' + self.m_start_time_stamp + ' --end-date="' + self.m_end_time_stamp + '"', expect_dict1)
+	    result2 = self.verify_show_response_msg('./radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict2)
+	else:
+	    result1 = self.verify_trim_response_msg('./bin/radosgw-admin usage trim --yes-i-really-mean-it --start-date="' + self.m_start_time_stamp + ' --end-date="' + self.m_end_time_stamp + '"', expect_dict1)
+	    result2 = self.verify_show_response_msg('./bin/radosgw-admin usage show --uid=zvampirem2 --subuser=chosenone2', expect_dict2)
 
-        if result == True:
+        if (result1 and result2) == True:
 	    self.m_test_passed_num += 1
 	    print "test_usage_trim_with_start_time_and_end_time_and_remove_all         %s" % (ok_display("OK"))
 	else:
@@ -708,23 +951,41 @@ class CephManager(object):
 
 #To create user and subuser for testing
     def create_user_and_subuser(self):
-	exec_command('./radosgw-admin user create --uid=zvampirem --access-key=zvampirem --secret-key=zvampirem --display-name="zvampirem"')
-        exec_command('./radosgw-admin user create --uid=zvampirem2 --access-key=zvampirem2 --secret-key=zvampirem2 --display-name="zvampirem2"')
-        exec_command('./radosgw-admin user create --uid=zvampirem3 --access-key=zvampirem3 --secret-key=zvampirem3 --display-name="zvampirem3"')
-	exec_command('./radosgw-admin subuser create --key-type=s3 --uid=zvampirem --subuser=chosenone --access=full --access-key=chosenone --secret-key=chosenone')
-        exec_command('./radosgw-admin subuser create --key-type=s3 --uid=zvampirem --subuser=chosenoneex --access=full --access-key=chosenoneex --secret-key=chosenoneex')
-        exec_command('./radosgw-admin subuser create --key-type=s3 --uid=zvampirem2 --subuser=chosenone2 --access=full --access-key=chosenone2 --secret-key=chosenone2')
-        exec_command('./radosgw-admin subuser create --key-type=s3 --uid=zvampirem3 --subuser=chosenone3 --access=full --access-key=chosenone3 --secret-key=chosenone3')
+	if CEPH_VERSION == "J":
+	    exec_command('./radosgw-admin user create --uid=zvampirem --access-key=zvampirem --secret-key=zvampirem --display-name="zvampirem"')
+            exec_command('./radosgw-admin user create --uid=zvampirem2 --access-key=zvampirem2 --secret-key=zvampirem2 --display-name="zvampirem2"')
+            exec_command('./radosgw-admin user create --uid=zvampirem3 --access-key=zvampirem3 --secret-key=zvampirem3 --display-name="zvampirem3"')
+	    exec_command('./radosgw-admin subuser create --key-type=s3 --uid=zvampirem --subuser=chosenone --access=full --access-key=chosenone --secret-key=chosenone')
+            exec_command('./radosgw-admin subuser create --key-type=s3 --uid=zvampirem --subuser=chosenoneex --access=full --access-key=chosenoneex --secret-key=chosenoneex')
+            exec_command('./radosgw-admin subuser create --key-type=s3 --uid=zvampirem2 --subuser=chosenone2 --access=full --access-key=chosenone2 --secret-key=chosenone2')
+            exec_command('./radosgw-admin subuser create --key-type=s3 --uid=zvampirem3 --subuser=chosenone3 --access=full --access-key=chosenone3 --secret-key=chosenone3')
+	else:
+	    exec_command('./bin/radosgw-admin user create --uid=zvampirem --access-key=zvampirem --secret-key=zvampirem --display-name="zvampirem"')
+            exec_command('./bin/radosgw-admin user create --uid=zvampirem2 --access-key=zvampirem2 --secret-key=zvampirem2 --display-name="zvampirem2"')
+            exec_command('./bin/radosgw-admin user create --uid=zvampirem3 --access-key=zvampirem3 --secret-key=zvampirem3 --display-name="zvampirem3"')
+	    exec_command('./bin/radosgw-admin subuser create --key-type=s3 --uid=zvampirem --subuser=chosenone --access=full --access-key=chosenone --secret-key=chosenone')
+            exec_command('./bin/radosgw-admin subuser create --key-type=s3 --uid=zvampirem --subuser=chosenoneex --access=full --access-key=chosenoneex --secret-key=chosenoneex')
+            exec_command('./bin/radosgw-admin subuser create --key-type=s3 --uid=zvampirem2 --subuser=chosenone2 --access=full --access-key=chosenone2 --secret-key=chosenone2')
+            exec_command('./bin/radosgw-admin subuser create --key-type=s3 --uid=zvampirem3 --subuser=chosenone3 --access=full --access-key=chosenone3 --secret-key=chosenone3')
+
 
 
     def trim_and_check(self, uid):
         if ":" in uid:
             user_list = uid.split(':')
-            exec_command("./radosgw-admin usage trim --uid=" + user_list[0] + " --subuser=" + user_list[1])
-            usage_log = exec_command_with_return("./radosgw-admin usage show --uid=" + user_list[0] + " --subuser=" + user_list[1])
+	    if CEPH_VERSION == "J":
+                exec_command("./radosgw-admin usage trim --uid=" + user_list[0] + " --subuser=" + user_list[1])
+		usage_log = exec_command_with_return("./radosgw-admin usage show --uid=" + user_list[0] + " --subuser=" + user_list[1])
+            else:
+                exec_command("./bin/radosgw-admin usage trim --uid=" + user_list[0] + " --subuser=" + user_list[1])
+                usage_log = exec_command_with_return("./bin/radosgw-admin usage show --uid=" + user_list[0] + " --subuser=" + user_list[1])
         else:
-            exec_command("./radosgw-admin usage trim --uid=" + uid)
-	    usage_log = exec_command_with_return("./radosgw-admin usage show --uid=" + uid)	
+	    if CEPH_VERSION == "J":
+                exec_command("./radosgw-admin usage trim --uid=" + uid)
+	        usage_log = exec_command_with_return("./radosgw-admin usage show --uid=" + uid)	
+	    else:
+	        exec_command("./bin/radosgw-admin usage trim --uid=" + uid)
+	        usage_log = exec_command_with_return("./bin/radosgw-admin usage show --uid=" + uid)
 	data = json.load(usage_log)	
         result = True
 
@@ -757,7 +1018,7 @@ class CephManager(object):
         and self.trim_and_check("zvampirem3") \
         and self.trim_and_check("zvampirem3:chosenone3"):
             print "Test End!"
-            print "Total test case: 31, OK: %d, FAIL: %d" % (self.m_tester.m_test_passed_num, 31 - self.m_tester.m_test_passed_num)
+            print "Total test case: 35, OK: %d, FAIL: %d" % (self.m_tester.m_test_passed_num, 35 - self.m_tester.m_test_passed_num)
 
 
     def print_pwd(self):
